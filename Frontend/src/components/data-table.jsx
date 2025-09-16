@@ -146,10 +146,6 @@ export function DataTable({ columns, data, pagination, onPageChange }) {
       </div>
       {/* Updated Pagination Controls */}
       <div className="flex items-center justify-between py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
         <div className="flex items-center space-x-4">
             <span className="text-sm">
                 Page {pagination.page} of {pagination.totalPages}
