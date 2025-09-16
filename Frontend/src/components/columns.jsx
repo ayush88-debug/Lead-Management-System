@@ -1,12 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -76,12 +74,11 @@ export const columns = (navigate, handleDelete, onViewLead) => [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            {/* --- MODIFICATION START --- */}
+
             <DropdownMenuItem onClick={() => onViewLead(lead)}>
               View Lead Details
             </DropdownMenuItem>
-            {/* --- MODIFICATION END --- */}
+
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate(`/leads/${lead._id}/edit`)}>
               Edit Lead
