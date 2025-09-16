@@ -49,52 +49,63 @@ const createLead = asyncHandler(async (req, res) => {
 const getLeads = asyncHandler(async (req, res) => {
   const {
     page = 1,
-    limit = 20,
+    limit = 10,
+    name,
     email,
     company,
-    city,
     status,
-    source,
-    score,
-    lead_value,
     created_at,
-    last_activity_at,
-    is_qualified,
   } = req.query;
 
   const query = {};
 
+  if (name) {
+    query.$or = [
+      { first_name: { $regex: name, $options: "i" } },
+      { last_name: { $regex: name, $options: "i" } },
+    ];
+  }
+
   if (email) query.email = { $regex: email, $options: "i" };
   if (company) query.company = { $regex: company, $options: "i" };
-  if (city) query.city = { $regex: city, $options: "i" };
-  if (status) query.status = status;
-  if (source) query.source = source;
-  if (score) query.score = Number(score);
-  if (lead_value) query.lead_value = Number(lead_value);
-  if (is_qualified) query.is_qualified = is_qualified === "true";
+  if (status) query.status = { $regex: status, $options: "i" };
   
-  // Basic date filtering
-  if (created_at) query.created_at = { $gte: new Date(created_at) };
-  if (last_activity_at)
-    query.last_activity_at = { $gte: new Date(last_activity_at) };
+  // --- CORRECTED DATE LOGIC FOR A SINGLE DAY ---
+  if (created_at) {
+    // The date string from the query will be like "2025-09-18"
+    const startOfDay = new Date(created_at);
+    startOfDay.setUTCHours(0, 0, 0, 0); // Set to the beginning of the day in UTC
 
-  const options = {
-    page: parseInt(page, 10),
-    limit: parseInt(limit, 10),
-    sort: { createdAt: -1 },
-  };
+    const endOfDay = new Date(created_at);
+    endOfDay.setUTCHours(23, 59, 59, 999); // Set to the end of the day in UTC
 
-  const leads = await Lead.paginate(query, options);
+    query.createdAt = { $gte: startOfDay, $lte: endOfDay };
+  }
+  // --- END OF CORRECTION ---
+
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+
+  const [leads, total] = await Promise.all([
+    Lead.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum),
+    Lead.countDocuments(query)
+  ]);
+
+  const totalPages = Math.ceil(total / limitNum);
 
   return res.status(200).json(
     new apiResponse(
       200,
       {
-        data: leads.docs,
-        page: leads.page,
-        limit: leads.limit,
-        total: leads.totalDocs,
-        totalPages: leads.totalPages,
+        data: leads,
+        page: pageNum,
+        limit: limitNum,
+        total: total,
+        totalPages: totalPages,
       },
       "Leads retrieved successfully"
     )

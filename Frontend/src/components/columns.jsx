@@ -12,29 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
-export const columns = (navigate, handleDelete) => [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+export const columns = (navigate, handleDelete, onViewLead) => [ 
   {
     accessorKey: "email",
     header: ({ column }) => {
@@ -99,9 +77,11 @@ export const columns = (navigate, handleDelete) => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(lead._id)}>
-              Copy lead ID
+            {/* --- MODIFICATION START --- */}
+            <DropdownMenuItem onClick={() => onViewLead(lead)}>
+              View Lead Details
             </DropdownMenuItem>
+            {/* --- MODIFICATION END --- */}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate(`/leads/${lead._id}/edit`)}>
               Edit Lead

@@ -6,20 +6,23 @@ const client = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
   headers: {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   },
-  validateStatus: () => true
+  validateStatus: () => true,
 });
 
 client.interceptors.response.use(
   (response) => {
-    // backend returns JSON like: { statusCode, data, message, success }
+    // If the status is 204 No Content, the response is successful but has no body.
+    if (response.status === 204) {
+      return Promise.resolve(null); // Resolve with null or an empty object
+    }
+
     const json = response.data;
     if (!json || typeof json !== "object") {
       return Promise.reject(new Error("Invalid JSON response from server"));
     }
 
-    // If HTTP status is not 2xx
     const httpOk = response.status >= 200 && response.status < 300;
     if (!httpOk || json.success === false) {
       const msg = json.message || "Request failed";
@@ -36,7 +39,6 @@ client.interceptors.response.use(
   }
 );
 
-
 export const signup = (username, email, password) =>
   client.post("/api/v1/auth/signup", { username, email, password });
 
@@ -48,7 +50,7 @@ export const verifyEmail = (verificationToken, verificationCode) =>
     "/api/v1/auth/verify-email",
     { verificationCode },
     {
-      headers: { Authorization: `Bearer ${verificationToken}` }
+      headers: { Authorization: `Bearer ${verificationToken}` },
     }
   );
 
@@ -60,8 +62,7 @@ export const getLeads = (params) => client.get("/api/v1/leads", { params });
 
 export const getLeadById = (id) => client.get(`/api/v1/leads/${id}`);
 
-export const createLead = (leadData) =>
-  client.post("/api/v1/leads", leadData);
+export const createLead = (leadData) => client.post("/api/v1/leads", leadData);
 
 export const updateLead = (id, leadData) =>
   client.put(`/api/v1/leads/${id}`, leadData);

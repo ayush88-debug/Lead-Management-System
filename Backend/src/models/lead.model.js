@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"; 
 
 const leadSchema = new mongoose.Schema(
   {
@@ -73,6 +74,7 @@ const leadSchema = new mongoose.Schema(
 );
 
 leadSchema.plugin(mongoosePaginate);
+leadSchema.plugin(mongooseAggregatePaginate);
 
 const Lead = mongoose.model("Lead", leadSchema);
 export default Lead;
