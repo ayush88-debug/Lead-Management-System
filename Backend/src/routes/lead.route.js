@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createLead, getLeads } from "../controllers/lead.controller.js";
+import { createLead, getLeads, getLeadById,updateLead,deleteLead, } from "../controllers/lead.controller.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -7,5 +7,12 @@ const router = Router();
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
 router.route("/").post(createLead).get(getLeads);
+
+router
+  .route("/:id")
+  .get(getLeadById)
+  .put(updateLead)
+  .delete(deleteLead);
+
 
 export default router;
