@@ -12,6 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+// List of fields to exclude from the form
+const excludedFields = ["_id", "id", "createdAt", "updatedAt", "__v"];
+
 export default function LeadForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -27,7 +30,6 @@ export default function LeadForm() {
     status: "new",
     score: "",
     lead_value: "",
-    is_qualified: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -76,6 +78,10 @@ export default function LeadForm() {
       setLoading(false);
     }
   };
+  
+  // Filter out excluded fields before rendering
+  const formFields = Object.keys(form).filter(key => !excludedFields.includes(key));
+
 
   if (loading && isEditing) return <div>Loading...</div>;
 
@@ -93,10 +99,9 @@ export default function LeadForm() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Form Fields */}
-              {Object.keys(form).map((key) => (
+              {formFields.map((key) => (
                 <div key={key}>
-                  <Label htmlFor={key} className="capitalize">{key.replace("_", " ")}</Label>
+                  <Label htmlFor={key} className="capitalize">{key.replace(/_/g, " ")}</Label>
                   {typeof form[key] === "boolean" ? (
                     <Input
                       id={key}
@@ -110,7 +115,7 @@ export default function LeadForm() {
                     <Input
                       id={key}
                       name={key}
-                      type={typeof form[key] === "number" ? "number" : "text"}
+                      type={key.includes("value") || key.includes("score") ? "number" : "text"}
                       value={form[key]}
                       onChange={handleChange}
                       required={
