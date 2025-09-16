@@ -55,3 +55,15 @@ export const verifyEmail = (verificationToken, verificationCode) =>
 export const logout = () => client.post("/api/v1/auth/logout");
 
 export const getUser = () => client.get("/api/v1/user/get-user");
+
+export const getLeads = (params) => client.get("/api/v1/leads", { params });
+
+export const getLeadById = (id) => client.get(`/api/v1/leads/${id}`);
+
+export const createLead = (leadData) =>
+  client.post("/api/v1/leads", leadData);
+
+export const updateLead = (id, leadData) =>
+  client.put(`/api/v1/leads/${id}`, leadData);
+
+export const deleteLead = (id) => client.delete(`/api/v1/leads/${id}`);
