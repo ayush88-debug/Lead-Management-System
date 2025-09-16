@@ -101,4 +101,35 @@ const getLeads = asyncHandler(async (req, res) => {
   );
 });
 
-export { createLead , getLeads};
+const getLeadById = asyncHandler(async (req, res) => {
+  const lead = await Lead.findById(req.params.id);
+  if (!lead) {
+    throw new apiError(404, "Lead not found");
+  }
+  return res
+    .status(200)
+    .json(new apiResponse(200, lead, "Lead retrieved successfully"));
+});
+
+const updateLead = asyncHandler(async (req, res) => {
+  const lead = await Lead.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!lead) {
+    throw new apiError(404, "Lead not found");
+  }
+  return res
+    .status(200)
+    .json(new apiResponse(200, lead, "Lead updated successfully"));
+});
+
+const deleteLead = asyncHandler(async (req, res) => {
+  const lead = await Lead.findByIdAndDelete(req.params.id);
+  if (!lead) {
+    throw new apiError(404, "Lead not found");
+  }
+  return res.status(204).send();
+});
+
+export { createLead , getLeads, getLeadById, updateLead, deleteLead};
